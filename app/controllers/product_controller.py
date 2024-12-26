@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.models.product import Product
 from app.schemas.product import ProductCreate, ProductUpdate
 from app.factory.stock_operations import StockOperationFactory
+from sqlalchemy import or_
 
 class ProductController:
     @staticmethod
@@ -56,3 +57,19 @@ class ProductController:
             product_id
         )
         return operation.execute(quantity)
+    @staticmethod
+    def search_products(db: Session, search_term: str, skip: int = 0, limit: int = 100):
+        """
+        Search products by a search term in fields such as name or description.
+        """
+        products = db.query(Product).filter(
+            or_(
+                Product.name.ilike(f"%{search_term}%"),
+                Product.description.ilike(f"%{search_term}%")
+            )
+        ).offset(skip).limit(limit).all()
+
+        if not products:
+            raise HTTPException(status_code=404, detail="No products found matching the search criteria")
+
+        return products

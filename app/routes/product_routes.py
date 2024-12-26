@@ -43,6 +43,15 @@ def update_product(
 def delete_product(product_id: int, db: Session = Depends(get_db)):
     return ProductController.delete_product(db, product_id)
 
+@product_router.get("/search/products", response_model=List[ProductResponse])
+def search_products(
+    search_term: str,
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db)
+):
+    return ProductController.search_products(db, search_term, skip, limit)
+
 @product_router.post("/{product_id}/stock", response_model=ProductResponse)
 def add_stock(
     product_id: int,
