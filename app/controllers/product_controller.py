@@ -59,9 +59,6 @@ class ProductController:
         return operation.execute(quantity)
     @staticmethod
     def search_products(db: Session, search_term: str, skip: int = 0, limit: int = 100):
-        """
-        Search products by a search term in fields such as name or description.
-        """
         products = db.query(Product).filter(
             or_(
                 Product.name.ilike(f"%{search_term}%"),
